@@ -1,0 +1,25 @@
+.wrapper {
+  padding: 50px;
+}
+
+.card {
+  width: 100px;
+  height: 100px;
+  text-align: center;
+  border: 1px solid red;
+}
+
+.drop-zone {
+  width: 200px;
+  height: 200px;
+  border: 1px solid blue;
+  padding: 50px;
+}
+
+.vm-droppable-over {
+  background: #ccc;
+}
+
+.custom-droppable-over {
+  background: #898989;
+}

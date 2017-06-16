@@ -1,0 +1,21 @@
+<div class="wrapper">
+  <div class="card"
+       vm-draggable
+
+       (vm-draggable-dragstart)="draggableOptions.dragstart($event)"
+       (vm-draggable-dragend)="draggableOptions.dragend($event)"
+
+       [vm-draggable-effect]="draggableOptions.effect"
+       [vm-draggable-disabled]="draggableOptions.disabled">
+    Draggable div
+  </div>
+  <div class="card drop-zone"
+       vm-droppable
+
+       (vm-droppable-dragover)="draggableOptions.dragover($event)"
+       (vm-droppable-drop)="draggableOptions.drop($event)"
+
+       [vm-droppable-hoverclass]="draggableOptions.hoverClass">
+    DROP TO ME
+  </div>
+</div>
