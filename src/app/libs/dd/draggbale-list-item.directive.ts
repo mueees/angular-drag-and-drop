@@ -24,6 +24,8 @@ export class DraggableListItemDirective extends DraggbaleDirective implements ID
   onDragStart(event: DragEvent) {
     event.stopPropagation();
 
+    event.dataTransfer.effectAllowed = 'move';
+
     event.dataTransfer.setData(this.getMimeType(), JSON.stringify(this.data));
 
     this.addDraggingClasses();

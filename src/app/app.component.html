@@ -10,37 +10,13 @@
     </li>
   </ul>
 
-  <div>
-    <h2>Parent DropZone</h2>
+  <ul
+    dd-droppable-list
+    (dd-dropped)="onParentDrop($event)"
+    class="drop-zone droppable-list">
 
-    <ul
-      dd-droppable-list
-      (dd-dropped)="onParentDrop($event)"
-      class="drop-zone droppable-list">
-
-      <li
-        dd-draggable-list-item
-        [dd-data]="card"
-        *ngFor="let card of parentCards">
-        <h3>{{card.title}}</h3>
-
-        <div>
-          <h2>Child DropZone</h2>
-
-          <ul
-            dd-droppable-list
-            (dd-dropped)="onChildDrop($event)"
-            class="drop-zone droppable-list">
-
-            <li
-              *ngFor="let card of childCards"
-              dd-draggable-list-item
-              [dd-data]="card">
-              <h4>{{card.title}}</h4>
-            </li>
-          </ul>
-        </div>
-      </li>
-    </ul>
-  </div>
+    <li *ngFor="let card of parentCards">
+      <h3>{{card.title}}</h3>
+    </li>
+  </ul>
 </div>

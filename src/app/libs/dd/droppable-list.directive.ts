@@ -5,7 +5,6 @@ import { DD } from './dd.constant';
 
 /**
  * @description
- *
  * */
 @Directive({
   selector: '[dd-droppable-list]'
@@ -20,6 +19,28 @@ export class DroppableListDirective extends DroppableDirective implements IDropp
   private placeholderNode: HTMLElement;
 
   private listNode: HTMLElement;
+
+  static getType(mimeType: string) {
+    const mimeTypePrefix = DD.mimeType + '-';
+
+    return mimeType ? mimeType.slice(mimeTypePrefix.length) : null;
+  }
+
+  static getMimeType(types: string[]) {
+    for (let i = 0; i < types.length; i++) {
+      if (types[i].substr(0, DD.mimeType.length) === DD.mimeType) {
+        return types[i];
+      }
+    }
+
+    return null;
+  }
+
+  static isHoverAboveTopHalf(listItemNode, yCoordinate) {
+    const rect = listItemNode.getBoundingClientRect();
+
+    return yCoordinate < rect.top + rect.height / 2;
+  }
 
   constructor(public elementRef: ElementRef) {
     super(elementRef);
@@ -40,8 +61,8 @@ export class DroppableListDirective extends DroppableDirective implements IDropp
     // is not supported. This must be done after preventDefault in Firefox.
     event.preventDefault();
 
-    const mimeType = this.getMimeType(event.dataTransfer.types);
-    const draggableType = this.getType(mimeType);
+    const mimeType = DroppableListDirective.getMimeType(event.dataTransfer.types);
+    const draggableType = DroppableListDirective.getType(mimeType);
 
     if (!this.isDropAllowed(event, draggableType)) {
       this.stopDragOperation();
@@ -68,7 +89,7 @@ export class DroppableListDirective extends DroppableDirective implements IDropp
       const listItemNode = this.findListItemNode(event.target);
 
       if (listItemNode && !this.isPlaceholderNode(listItemNode)) {
-        const isFirstHalf = this.isHoverAboveTopHalf(listItemNode, event.clientY);
+        const isFirstHalf = DroppableListDirective.isHoverAboveTopHalf(listItemNode, event.clientY);
 
         const listNodeIndex = this.getListItemIndex(listItemNode);
 
@@ -97,8 +118,8 @@ export class DroppableListDirective extends DroppableDirective implements IDropp
     event.preventDefault();
     event.stopPropagation();
 
-    let mimeType = this.getMimeType(event.dataTransfer.types);
-    let draggableType = this.getType(mimeType);
+    const mimeType = DroppableListDirective.getMimeType(event.dataTransfer.types);
+    const draggableType = DroppableListDirective.getType(mimeType);
 
     if (!this.isDropAllowed(event, draggableType)) {
       this.stopDragOperation();
@@ -113,7 +134,7 @@ export class DroppableListDirective extends DroppableDirective implements IDropp
     } catch (e) {
     }
 
-    let insertIndex = this.findListItemNode(event.target) ? this.getPlaceholderIndex() : 0;
+    const insertIndex = this.findListItemNode(event.target) ? this.getPlaceholderIndex() : 0;
 
     // user can cancel drop operation
     if (this.dropCallback && !this.dropCallback(event, transferData, draggableType, insertIndex)) {
@@ -161,22 +182,6 @@ export class DroppableListDirective extends DroppableDirective implements IDropp
     return true;
   }
 
-  private getType(mimeType: string) {
-    const mimeTypePrefix = DD.mimeType + '-';
-
-    return mimeType ? mimeType.slice(mimeTypePrefix.length) : null;
-  }
-
-  private getMimeType(types: string[]) {
-    for (let i = 0; i < types.length; i++) {
-      if (types[i].substr(0, DD.mimeType.length) === DD.mimeType) {
-        return types[i];
-      }
-    }
-
-    return null;
-  }
-
   private isDropAllowed(event, draggableType: string) {
     if (this.isOverNesterDropZone(event)) {
       return false;
@@ -185,12 +190,6 @@ export class DroppableListDirective extends DroppableDirective implements IDropp
     } else {
       return this.allowedTypes.indexOf(draggableType) !== -1;
     }
-  }
-
-  private isHoverAboveTopHalf(listItemNode, yCoordinate) {
-    const rect = listItemNode.getBoundingClientRect();
-
-    return yCoordinate < rect.top + rect.height / 2;
   }
 
   private isListEmpty() {
