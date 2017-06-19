@@ -1,1 +1,25 @@
-/* You can add global styles to this file, and also import other style files */
+ul {
+  padding: 0;
+  marging: 0;
+}
+
+li {
+  list-style: none;
+}
+
+.card {
+  border: 1px solid blue;
+  width: 100px;
+  height: 50px;
+}
+
+.drop-zone {
+  border: 1px solid red;
+  min-height: 20px;
+  margin: 20px;
+  min-width: 200px;
+}
+
+.drop-zone li {
+  border: 1px solid gold;
+}

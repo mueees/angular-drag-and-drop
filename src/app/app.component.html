@@ -1,39 +1,46 @@
 <div class="wrapper" style="display: flex">
-    <ul>
-        <li *ngFor="let card of availableCards">
-            <div class="card"
-                 dd-draggable-list-item
-                 [dd-type]="card.type"
-                 [dd-data]="card">
-                {{card.title}}
-            </div>
-        </li>
+  <ul>
+    <li *ngFor="let card of availableCards">
+      <div class="card"
+           dd-draggable-list-item
+           [dd-type]="card.type"
+           [dd-data]="card">
+        {{card.title}}
+      </div>
+    </li>
+  </ul>
+
+  <div>
+    <h2>Parent DropZone</h2>
+
+    <ul
+      dd-droppable-list
+      (dd-dropped)="onParentDrop($event)"
+      class="drop-zone droppable-list">
+
+      <li
+        dd-draggable-list-item
+        [dd-data]="card"
+        *ngFor="let card of parentCards">
+        <h3>{{card.title}}</h3>
+
+        <div>
+          <h2>Child DropZone</h2>
+
+          <ul
+            dd-droppable-list
+            (dd-dropped)="onChildDrop($event)"
+            class="drop-zone droppable-list">
+
+            <li
+              *ngFor="let card of childCards"
+              dd-draggable-list-item
+              [dd-data]="card">
+              <h4>{{card.title}}</h4>
+            </li>
+          </ul>
+        </div>
+      </li>
     </ul>
-
-    <ul class="drop-zone droppable-list"
-        vm-droppable-list
-        (dd-dropped)="onDropLeft($event)"
-        [dd-allowed-types]="allowedTypes">
-
-        <li *ngFor="let card of left"
-            dd-draggable-list-item
-            [dd-type]="card.type"
-            [dd-data]="card">
-            {{card.title}}
-        </li>
-    </ul>
-
-    <ul class="drop-zone droppable-list"
-        vm-droppable-list
-        (dd-dropped)="onDropRight($event)"
-        [dd-allowed-types]="allowedTypes">
-
-        <li *ngFor="let card of right"
-            dd-draggable-list-item
-            [dd-type]="card.type"
-            [dd-data]="card">
-            {{card.title}}
-        </li>
-    </ul>
-
+  </div>
 </div>
