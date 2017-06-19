@@ -1,43 +1,66 @@
-import { Component } from '@angular/core';
+import {Component, OnChanges} from "@angular/core";
+import {findIndex, find, remove} from 'lodash';
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+    selector: 'my-app',
+    templateUrl: 'app.component.html'
 })
-export class AppComponent {
-  data: any = {
-    type: 'rx-id'
-  };
+export class AppComponent implements OnChanges {
+    availableCards = [
+        {
+            id: 1,
+            title: '1',
+            type: 'card'
+        },
+        {
+            id: 2,
+            title: '2',
+            type: 'card'
+        },
+        {
+            id: 3,
+            title: '3',
+            type: 'card'
+        },
+        {
+            id: 4,
+            title: '4',
+            type: 'card'
+        }
+    ];
 
-  draggableOptions = {
-    disabled: false,
+    allowedTypes = [
+        'card'
+    ];
 
-    dragstart: (event: DragEvent) => {
-      //console.log(event);
+    left: any[] = [];
+    right: any[] = [];
 
-      // add to drag element any data
-      event.dataTransfer.setData('data', JSON.stringify(this.data));
-    },
+    onDrop(cards, onDropOptions: any) {
+        let movedCard = find(cards, card => card.id === onDropOptions.transferData.id);
 
-    dragend: (event) => {
-      // console.log(event);
-    },
+        if (movedCard) {
+            movedCard.$$destroy = true;
+        }
 
-    // Droppable element
+        cards.splice(onDropOptions.insertIndex, 0, onDropOptions.transferData);
 
-    hoverClass: 'custom-droppable-over',
+        if (movedCard) {
+            console.log('removed');
 
-    dragover: (event) => {
-      // console.log(event);
-
-    },
-
-    drop: (event) => {
-      // console.log(event);
+            remove(cards, card => card.$$destroy);
+        }
     }
-  };
 
-  constructor() {
-  }
+    onDropRight(dropOptions) {
+        this.onDrop(this.right, dropOptions);
+    }
+
+    onDropLeft(dropOptions) {
+        this.onDrop(this.left, dropOptions);
+    }
+
+    ngOnChanges(changes) {
+        console.log(changes);
+    }
 }

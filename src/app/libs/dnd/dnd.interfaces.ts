@@ -1,9 +1,11 @@
-export interface IDraggableOptions {
-  disabled: boolean;
-  effect: string;
+export interface IDroppable {
+    onDragEnter(event: DragEvent);
+    onDragLeave(event: DragEvent);
+    onDragOver(event: DragEvent);
+    onDrop(event: DragEvent);
 }
 
-
-export interface IDroppableOptions {
-  disabled: boolean;
+export interface IDraggable {
+    onDragStart(event: DragEvent);
+    onDragEnd(event: DragEvent);
 }

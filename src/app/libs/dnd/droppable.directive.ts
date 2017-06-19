@@ -1,100 +1,68 @@
-import {
-  Directive,
-  ElementRef,
-  EventEmitter,
-  HostListener,
-  Input,
-  OnChanges,
-  OnInit,
-  Output,
-  Renderer2
-} from '@angular/core';
+import {Directive, ElementRef, HostListener} from "@angular/core";
 
 @Directive({
-  selector: '[vm-droppable]'
+    selector: '[vm-droppable]'
 })
-export class DroppableDirective implements OnInit, OnChanges {
-  @Output('vm-droppable-dragenter') dragenter: any = new EventEmitter<any>();
-  @Output('vm-droppable-dragleave') dragleave: any = new EventEmitter<any>();
-  @Output('vm-droppable-drop') dropEmitter: any = new EventEmitter<any>();
-  @Output('vm-droppable-dragover') dragoverEmmiter: any = new EventEmitter<any>();
+export class DroppableDirective {
+    private isLogging: boolean = false;
+    private isDragElementOverDropzone: boolean = false;
 
-  @HostListener('dragenter', ['$event']) dragEnter(event: DragEvent) {
-    if (!this.configuration.disabled) {
-      // apply default options
-      event.preventDefault();
+    @HostListener('dragenter', ['$event']) dragEnter(event: DragEvent) {
+        this.log('Droppable Directive: enter');
 
-      this.Renderer2.addClass(this.elementRef.nativeElement, this.configuration.hoverClass);
+        event.preventDefault();
 
-      this.dragenter.next(event);
+        if (!this.isDragElementOverDropzone) {
+            this.isDragElementOverDropzone = true;
+
+            this.callCallback('onDragEnter', event);
+        }
     }
-  }
 
-  @HostListener('dragleave', ['$event']) dragLeave(event: DragEvent) {
-    if (!this.configuration.disabled) {
-      // apply default options
-      event.preventDefault();
+    @HostListener('dragleave', ['$event']) dragLeave(event: DragEvent) {
+        this.log('Droppable Directive: leave');
 
-      this.Renderer2.removeClass(this.elementRef.nativeElement, this.configuration.hoverClass);
+        event.preventDefault();
 
-      this.dragleave.next(event);
+        if (!this.isOverElement(event)) {
+            this.isDragElementOverDropzone = false;
+
+            this.callCallback('onDragLeave', event);
+        }
     }
-  }
 
-  @HostListener('drop', ['$event'])
-  drop(event: DragEvent) {
-    if (!this.configuration.disabled) {
-      // apply default options
-      event.preventDefault();
+    @HostListener('drop', ['$event']) drop(event: DragEvent) {
+        this.log('Droppable Directive: drop');
 
-      // Get the data
-      const data = event.dataTransfer.getData('data');
+        event.preventDefault();
 
-      this.Renderer2.removeClass(this.elementRef.nativeElement, this.configuration.hoverClass);
-
-      // call user callback
-      this.dropEmitter.next(event);
+        this.callCallback('onDrop', event);
     }
-  }
 
-  @HostListener('dragover', ['$event'])
-  dragOver(event) {
-    if (!this.configuration.disabled) {
-      // apply default options
-      event.preventDefault();
+    @HostListener('dragover', ['$event']) dragOver(event: DragEvent) {
+        this.log('Droppable Directive: over');
 
-      // Set the dropEffect to move
-      event.dataTransfer.dropEffect = 'move';
+        event.preventDefault();
 
-      // call user callback
-      this.dragoverEmmiter.next(event);
+        this.callCallback('onDragOver', event);
     }
-  }
 
-  @Input('vm-droppable-disabled') disabled: boolean;
-  @Input('vm-droppable-hoverclass') hoverClass: boolean;
+    constructor(public elementRef: ElementRef) {
+    }
 
-  private publicInputNames: string[] = [
-    'disabled',
-    'hoverClass'
-  ];
+    public isOverElement(event: DragEvent) {
+        const newTargetNodes = document.elementFromPoint(event.clientX, event.clientY);
 
-  private configuration: any = {
-    disabled: false,
-    hoverClass: 'vm-droppable-over'
-  };
+        return this.elementRef.nativeElement.contains(newTargetNodes);
+    }
 
-  constructor(private elementRef: ElementRef, private Renderer2: Renderer2) {
-  }
+    private log(message) {
+        if (this.isLogging) {
+            console.log(message);
+        }
+    }
 
-  ngOnInit() {
-  }
-
-  ngOnChanges(changes) {
-    this.publicInputNames.forEach((publicInputName) => {
-      if (changes[publicInputName]) {
-        this.configuration[publicInputName] = changes[publicInputName].currentValue;
-      }
-    });
-  }
+    private callCallback(methodName, event: DragEvent) {
+        this[methodName](event);
+    }
 }
