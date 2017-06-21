@@ -22,6 +22,7 @@ export class DraggableListItemDirective extends DraggbaleDirective implements ID
   }
 
   onDragStart(event: DragEvent) {
+    console.log('dd-draggable-list-item')
     event.stopPropagation();
 
     // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/effectAllowed
@@ -31,6 +32,11 @@ export class DraggableListItemDirective extends DraggbaleDirective implements ID
     event.dataTransfer.setData(this.getMimeType(), JSON.stringify(this.data));
 
     this.addDraggingClasses();
+
+    // set proper drag image if triggered on a draggable handle
+    if (event[DD.draggableHandleMarker] && event.dataTransfer['setDragImage']) {
+      event.dataTransfer['setDragImage'](this.elementNode, 0, 0);
+    }
 
     this.dragstartEvent.next(event);
   }

@@ -5,7 +5,14 @@
            dd-draggable-list-item
            [dd-type]="card.type"
            [dd-data]="card">
-        {{card.title}}
+        <div dd-no-draggable>
+          <h2>{{card.title}}</h2>
+
+          <div dd-draggable-handle>dd-draggable-handle</div>
+
+          <div><input type="text" placeholder="SHOULD BE CLICKED"></div>
+        </div>
+
       </div>
     </li>
   </ul>

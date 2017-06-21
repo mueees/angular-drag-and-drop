@@ -4,6 +4,8 @@ import { DraggbaleDirective } from './draggbale.directive';
 import { DroppableDirective } from './droppable.directive';
 import { DroppableListDirective } from './droppable-list.directive';
 import { DraggableListItemDirective } from './draggbale-list-item.directive';
+import { DraggableHandleDirective } from './draggbale-handle.directive';
+import { NoDraggableDirective } from './no-draggable.directive';
 
 @NgModule({
   imports: [
@@ -11,12 +13,16 @@ import { DraggableListItemDirective } from './draggbale-list-item.directive';
   ],
   entryComponents: [],
   declarations: [
+    NoDraggableDirective,
+    DraggableHandleDirective,
     DraggbaleDirective,
     DraggableListItemDirective,
     DroppableDirective,
     DroppableListDirective
   ],
   exports: [
+    NoDraggableDirective,
+    DraggableHandleDirective,
     DraggbaleDirective,
     DraggableListItemDirective,
     DroppableDirective,
