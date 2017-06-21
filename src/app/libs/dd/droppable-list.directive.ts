@@ -1,4 +1,4 @@
-import { Directive, ElementRef, EventEmitter, Input, Output } from '@angular/core';
+import { Directive, ElementRef, Input } from '@angular/core';
 import { DroppableDirective } from './droppable.directive';
 import { IDroppable } from './dd.interfaces';
 import { DD } from './dd.constant';
@@ -10,11 +10,21 @@ import { DD } from './dd.constant';
   selector: '[dd-droppable-list]'
 })
 export class DroppableListDirective extends DroppableDirective implements IDroppable {
-  @Output('dd-dropped') droppedEvent: any = new EventEmitter<any>();
-
+  @Input('dd-droppable-list') itemList: any[];
   @Input('dd-allowed-types') allowedTypes: string[] = [];
   @Input('dd-drop') dropCallback: Function;
   @Input('dd-dragover') dragOverCallback: Function;
+
+  private effectMap: any = {
+    'none': 'none',
+    'copy': 'copy',
+    'copyMove': 'move',
+    'copyLink': 'link',
+    'link': 'link',
+    'linkMove': 'move',
+    'move': 'move',
+    'all': 'move'
+  };
 
   private placeholderNode: HTMLElement;
 
@@ -54,6 +64,8 @@ export class DroppableListDirective extends DroppableDirective implements IDropp
 
   onDragEnter(event: DragEvent) {
     event.preventDefault();
+
+    event.dataTransfer.dropEffect = this.getDropEffect(event.dataTransfer.effectAllowed);
   }
 
   onDragOver(event: DragEvent) {
@@ -61,14 +73,19 @@ export class DroppableListDirective extends DroppableDirective implements IDropp
     // is not supported. This must be done after preventDefault in Firefox.
     event.preventDefault();
 
+    // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/dropEffect
     const mimeType = DroppableListDirective.getMimeType(event.dataTransfer.types);
     const draggableType = DroppableListDirective.getType(mimeType);
 
-    if (!this.isDropAllowed(event, draggableType)) {
+    if (!mimeType || !this.isDropAllowed(event, draggableType)) {
+      event.dataTransfer.dropEffect = DD.dropEffect.none;
+
       this.stopDragOperation();
 
       return true;
     }
+
+    event.dataTransfer.dropEffect = this.getDropEffect(event.dataTransfer.effectAllowed);
 
     let insertIndex;
 
@@ -121,7 +138,7 @@ export class DroppableListDirective extends DroppableDirective implements IDropp
     const mimeType = DroppableListDirective.getMimeType(event.dataTransfer.types);
     const draggableType = DroppableListDirective.getType(mimeType);
 
-    if (!this.isDropAllowed(event, draggableType)) {
+    if (!mimeType || !this.isDropAllowed(event, draggableType)) {
       this.stopDragOperation();
 
       return true;
@@ -136,19 +153,29 @@ export class DroppableListDirective extends DroppableDirective implements IDropp
 
     const insertIndex = this.findListItemNode(event.target) ? this.getPlaceholderIndex() : 0;
 
-    // user can cancel drop operation
-    if (this.dropCallback && !this.dropCallback(event, transferData, draggableType, insertIndex)) {
-      this.stopDragOperation();
+    if (this.dropCallback) {
+      const dropResult = this.dropCallback(event, transferData, draggableType, insertIndex);
 
-      return true;
+      switch (true) {
+        case dropResult === true:
+          // do nothing, drop is allowed but user will take care of inserting the element
+          break;
+        case dropResult === false:
+          // do nothing, user cancel drop operation
+          break;
+        default:
+          // consider dropResult as the item that should be inserted in the list
+          if (this.isUserPassesItemList()) {
+            this.itemList.splice(insertIndex, 0, transferData);
+          }
+
+          break;
+      }
+    } else {
+      if (this.isUserPassesItemList()) {
+        this.itemList.splice(insertIndex, 0, transferData);
+      }
     }
-
-    this.droppedEvent.next({
-      event: event,
-      transferData: transferData,
-      draggableType: draggableType,
-      insertIndex: insertIndex
-    });
 
     this.stopDragOperation();
   }
@@ -174,6 +201,10 @@ export class DroppableListDirective extends DroppableDirective implements IDropp
     }
 
     return Boolean(nestedDropZone);
+  }
+
+  private isUserPassesItemList() {
+    return Boolean(this.itemList);
   }
 
   private stopDragOperation() {
@@ -232,5 +263,9 @@ export class DroppableListDirective extends DroppableDirective implements IDropp
 
   private getListItemIndex(listItemNode) {
     return Array.prototype.indexOf.call(this.listNode.children, listItemNode);
+  }
+
+  private getDropEffect(effectAllowed) {
+    return this.effectMap[effectAllowed] || 'none';
   }
 }

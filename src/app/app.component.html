@@ -11,8 +11,7 @@
   </ul>
 
   <ul
-    dd-droppable-list
-    (dd-dropped)="onParentDrop($event)"
+    [dd-droppable-list]="parentCards"
     class="drop-zone droppable-list">
 
     <li *ngFor="let card of parentCards">

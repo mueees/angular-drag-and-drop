@@ -5,5 +5,9 @@ export const DD = {
   draggingClass: 'ddDragging',
   draggingSourceClass: 'ddDraggingSource',
 
-  droppableListMarker: 'dd-droppable-list'
+  droppableListMarker: 'dd-droppable-list',
+
+  dropEffect: {
+    none: 'none'
+  }
 };

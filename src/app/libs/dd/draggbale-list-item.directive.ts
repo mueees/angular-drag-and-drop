@@ -24,7 +24,9 @@ export class DraggableListItemDirective extends DraggbaleDirective implements ID
   onDragStart(event: DragEvent) {
     event.stopPropagation();
 
-    event.dataTransfer.effectAllowed = 'move';
+    // https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/effectAllowed
+    // Define effects which user could set in dragenter, dragover events
+    event.dataTransfer.effectAllowed = 'copyMove';
 
     event.dataTransfer.setData(this.getMimeType(), JSON.stringify(this.data));
 
